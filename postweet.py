@@ -79,7 +79,7 @@ def main():
             else:
                 if "ow.ly/" in link:
                     t.update_status(status=T+'\n'+link)
-                elif "twtter.com" in link:
+                elif "twitter.com" in link:
                     #t.update_status(status=T+'\n'+link)
                     print("引用リツイート")
                 else:
