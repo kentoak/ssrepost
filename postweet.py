@@ -24,7 +24,8 @@ def main():
     onlyLink=[]
     repostText=[]
     #tweetsFromSSrepost = tweepy.Cursor(t.search_tweets,q='http',id="ssrepost",tweet_mode='extended',include_entities=True,result_type='recent',lang='en').items(100)
-    tweetsFromSSrepost = tweepy.Cursor(t.user_timeline,user_id="ssrepost",tweet_mode='extended').items(500)
+    tweetsFromSSrepost = tweepy.Cursor(t.user_timeline,user_id="ssrepost",tweet_mode='extended').items(300)
+    print("\n@ssrepost")
     for tweet in tweetsFromSSrepost:
         if len(tweet.entities['urls'])>0:
             if hasattr(tweet,"full_text"):
@@ -35,12 +36,14 @@ def main():
             if tweet.full_text[:2] == "RT":
                 print("引用リツイート")
             else:
-                print("Linkなし！",tweet.full_text.replace('&amp;','&').replace('’','\''))
-                repostText.append(tweet.full_text.lower().replace('&amp;','&').replace('’','\''))
-    
-    print(repostText)
-    #print("tao")
+                #print("Linkなし！",tweet.full_text.replace('&amp;','&').replace('’','\''))
+                if "https://t.co/" in tweet.full_text:
+                    repostText.append(tweet.full_text[:tweet.full_text.find("https://t.co/")].lower().replace('&amp;','&').replace('’','\''))
+                else:
+                    repostText.append(tweet.full_text.lower().replace('&amp;','&').replace('’','\''))
+
     tweetsFromSS = tweepy.Cursor(t.user_timeline,id="swimswamnews",tweet_mode='extended',include_entities=True).items(100)
+    print("\n@SwimSwamNews")
     for tw in tweetsFromSS:
         if len(tw.entities['urls'])>0:
             if hasattr(tw,"full_text"):
@@ -51,7 +54,7 @@ def main():
             if tw.full_text[:2] == "RT":
                 print("引用リツイート")
             else:
-                print("Linkなし！",tw.full_text[:tw.full_text.find('http')-1].replace('&amp;','&').replace('’','\''))
+                #print("Linkなし！",tw.full_text.replace('&amp;','&').replace('’','\''))
                 onlyLink.append("nolink")
                 onlyTxt.append(tw.full_text.replace('&amp;','&').replace('’','\''))
                 onlytxt.append(tw.full_text.lower().replace('&amp;','&').replace('’','\''))
@@ -71,19 +74,32 @@ def main():
         print("now is ",i)
         #print("\n",T,"\n",link)
         print(onlytxt[i+1:].count(txt),repostText.count(txt))
-        if onlytxt[i+1:].count(txt)==0 and repostText.count(txt)==0:
+        newTweetflag=False
+        if "https://t.co/" in txt:
+            print("画像系ツイート")
+            print(txt[:txt.find("https://t.co/")],repostText.count(txt[:txt.find("https://t.co/")]))
+            if onlytxt[i+1:].count(txt[:txt.find("https://t.co/")])==0 and repostText.count(txt[:txt.find("https://t.co/")])==0:   
+                print(onlytxt[i+1:].count(txt[:txt.find("https://t.co/")]),repostText.count(txt[:txt.find("https://t.co/")]))    
+                newTweetflag=True
+        else:
+            if onlytxt[i+1:].count(txt)==0 and repostText.count(txt)==0:
+                print(onlytxt[i+1:].count(txt),repostText.count(txt))
+                newTweetflag=True
+        if newTweetflag:
             print(txt,"is new one !!!")
             if link=="nolink":
-                t.update_status(status=T)
+                #t.update_status(status=T)
                 print("Linkなしバージョン",T)
             else:
                 if "ow.ly/" in link:
-                    t.update_status(status=T+'\n'+link)
-                elif "twitter.com" in link:
                     #t.update_status(status=T+'\n'+link)
-                    print("引用リツイート")
+                    print(T+'\n'+link)
+                if "twitter.com" in link:
+                    print("引用リツイートなのでツイートしません")
+                    #print(T+'\n'+link)
                 else:
-                    t.update_status(status=T+'\n'+link[:-1])
+                    #t.update_status(status=T+'\n'+link[:-1])
+                    print(T+'\n'+link[:-1])
             time.sleep(10)
     print("Done")
 
