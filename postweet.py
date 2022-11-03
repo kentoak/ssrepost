@@ -1,7 +1,5 @@
-#from getwilog import GetTwilog
 import sys
 sys.path.append('/usr/local/lib/python3.9/site-packages') #pip show tweepyで出た。
-#pprint.pprint(sys.path)
 import twitterAPIConfig
 import tweepy
 import time
@@ -79,7 +77,6 @@ def main():
         txt=onlyTxt[i].lower()
         link=onlyLink[i]
         print("now is ",i)
-        #print("\n",T,"\n",link)
         print(onlytxt[i+1:].count(txt),repostText.count(txt))
         newTweetflag=False
         if "https://t.co/" in txt:
