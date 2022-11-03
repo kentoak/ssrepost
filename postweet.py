@@ -92,17 +92,17 @@ def main():
         if newTweetflag:
             print(txt,"is new one !!!")
             if link=="nolink":
-                #t.update_status(status=T)
+                t.update_status(status=T)
                 print("Linkなしバージョン",T)
             else:
                 if "ow.ly/" in link:
-                    #t.update_status(status=T+'\n'+link)
+                    t.update_status(status=T+'\n'+link)
                     print(T+'\n'+link)
                 if "twitter.com" in link:
                     print("引用リツイートなのでツイートしません")
-                    #print(T+'\n'+link)
+                    print(T+'\n'+link)
                 else:
-                    #t.update_status(status=T+'\n'+link[:-1])
+                    t.update_status(status=T+'\n'+link[:-1])
                     print(T+'\n'+link[:-1])
             time.sleep(10)
     print("Done")
