@@ -23,7 +23,6 @@ def main():
     onlytxt=[]
     onlyLink=[]
     repostText=[]
-    #tweetsFromSSrepost = tweepy.Cursor(t.search_tweets,q='http',id="ssrepost",tweet_mode='extended',include_entities=True,result_type='recent',lang='en').items(100)
     tweetsFromSSrepost = tweepy.Cursor(t.user_timeline,user_id="ssrepost",tweet_mode='extended').items(300)
     print("\n@ssrepost")
     for tweet in tweetsFromSSrepost:
@@ -34,7 +33,7 @@ def main():
                 repostText.append(tweet.full_text[:tweet.full_text.find('http')-1].lower().replace('&amp;','&').replace('’','\''))
         else:
             if tweet.full_text[:2] == "RT":
-                print("引用リツイート")
+                print("引用リツイート,",tweet.full_text)
             else:
                 #print("Linkなし！",tweet.full_text.replace('&amp;','&').replace('’','\''))
                 if "https://t.co/" in tweet.full_text:
@@ -43,18 +42,26 @@ def main():
                     repostText.append(tweet.full_text.lower().replace('&amp;','&').replace('’','\''))
 
     tweetsFromSS = tweepy.Cursor(t.user_timeline,id="swimswamnews",tweet_mode='extended',include_entities=True).items(100)
+    quoteIds=[]
     print("\n@SwimSwamNews")
     for tw in tweetsFromSS:
         if len(tw.entities['urls'])>0:
             if hasattr(tw,"full_text"):
-                onlyLink.append(tw.entities['urls'][0]['expanded_url'])
-                onlyTxt.append(tw.full_text[:tw.full_text.find('http')-1].replace('&amp;','&').replace('’','\''))
-                onlytxt.append(tw.full_text[:tw.full_text.find('http')-1].lower().replace('&amp;','&').replace('’','\''))
+                if "https://twitter.com" in tw.entities['urls'][0]['expanded_url']:
+                    quoteIds.append(tw.id)
+                    print("引用リツイート, ",tw.full_text)
+                elif tw.full_text[:2] == "RT":
+                    print("リツイート（リンクあり）, ",tw.full_text)
+                else:
+                    onlyLink.append(tw.entities['urls'][0]['expanded_url'])
+                    onlyTxt.append(tw.full_text[:tw.full_text.find('http')-1].replace('&amp;','&').replace('’','\''))
+                    onlytxt.append(tw.full_text[:tw.full_text.find('http')-1].lower().replace('&amp;','&').replace('’','\''))
         else:
             if tw.full_text[:2] == "RT":
-                print("引用リツイート")
+                print("リツイート（リンクなし）, ",tw.full_text)
+            elif tw.in_reply_to_status_id:
+                print("リプライ, ",tw.in_reply_to_status_id)
             else:
-                #print("Linkなし！",tw.full_text.replace('&amp;','&').replace('’','\''))
                 onlyLink.append("nolink")
                 onlyTxt.append(tw.full_text.replace('&amp;','&').replace('’','\''))
                 onlytxt.append(tw.full_text.lower().replace('&amp;','&').replace('’','\''))
