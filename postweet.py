@@ -30,14 +30,17 @@ def main():
         if len(tweet.entities['urls'])>0:
             if hasattr(tweet,"full_text"):
                 if "http" in tweet.full_text[:tweet.full_text.find('http')-1]:
-                    continue
-                repostText.append(tweet.full_text[:tweet.full_text.find('http')-1].lower().replace('&amp;','&').replace('’','\''))
+                    print("本文なしリンクのみ",tweet.full_text[:tweet.full_text.find('http')-1],tweet.entities['urls'][0]['expanded_url']) 
+                    repostText.append(tweet.entities['urls'][0]['expanded_url'])
+                else:
+                    repostText.append(tweet.full_text[:tweet.full_text.find('http')-1].lower().replace('&amp;','&').replace('’','\''))
         else:
             if tweet.full_text[:2] == "RT":
                 print("引用リツイート")
             else:
                 #print("Linkなし！",tweet.full_text.replace('&amp;','&').replace('’','\''))
-                if "https://t.co/" in tweet.full_text:
+                if "https://t.co/" in tweet.full_text:#リンクなしの画像ツイート
+                    print("リンクなしの画像ツイート",tweet.full_text[:tweet.full_text.find("https://t.co/")])
                     repostText.append(tweet.full_text[:tweet.full_text.find("https://t.co/")].lower().replace('&amp;','&').replace('’','\''))
                 else:
                     repostText.append(tweet.full_text.lower().replace('&amp;','&').replace('’','\''))
@@ -56,6 +59,10 @@ def main():
                     print("引用リツイート, ",tw.full_text)
                 elif tw.full_text[:2] == "RT":
                     print("リツイート（リンクあり）, ",tw.full_text)
+                elif "http" in tw.full_text[:tw.full_text.find('http')-1]:
+                    onlyTxt.append(tw.full_text[:tw.full_text.find('http')-1])
+                    onlyLink.append(tw.entities['urls'][0]['expanded_url'])
+                    onlytxt.append(tw.full_text[:tw.full_text.find('http')-1])
                 else:
                     onlyLink.append(tw.entities['urls'][0]['expanded_url'])
                     onlyTxt.append(tw.full_text[:tw.full_text.find('http')-1].replace('&amp;','&').replace('’','\''))
@@ -92,10 +99,10 @@ def main():
         print(onlytxt[i+1:].count(txt),repostText.count(txt))
         newTweetflag=False
         if "https://t.co/" in txt:
-            print("画像系ツイート",T,txt)
-            print("repostでツイートされているか",txt[:txt.find("https://t.co/")],repostText.count(txt[:txt.find("https://t.co/")]))
-            if onlytxt[i+1:].count(txt[:txt.find("https://t.co/")])==0 and repostText.count(txt[:txt.find("https://t.co/")])==0:   
-                print("(SwimSwamでのツイートの数,repostでの当該ツイートの数)",onlytxt[i+1:].count(txt[:txt.find("https://t.co/")]),repostText.count(txt[:txt.find("https://t.co/")]))    
+            print("画像系ツイート",T,txt,link)
+            print("repostでツイートされているか",txt[:txt.find("https://t.co/")],repostText.count(txt[:txt.find("https://t.co/")]),link[:-1] in repostText)
+            if onlytxt[i+1:].count(txt[:txt.find("https://t.co/")])==0 and repostText.count(txt[:txt.find("https://t.co/")])==0 and repostText.count(link[:-1])==0:   
+                print("(SwimSwamでのツイートの数,repostでの当該ツイートの数)",onlytxt[i+1:].count(txt[:txt.find("https://t.co/")]),repostText.count(link[:-1])) 
                 newTweetflag=True
         else:
             if onlytxt[i+1:].count(txt)==0 and repostText.count(txt)==0:
